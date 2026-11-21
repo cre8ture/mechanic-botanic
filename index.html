@@ -1,0 +1,2432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Mechanic Botanic — Kai Kleinbard</title>
+  <meta name="title" content="Mechanic Botanic — Kai Kleinbard" />
+  <meta name="description" content="Mechanic Botanic by Kai Kleinbard — an interactive 3D digital garden and vintage herbarium wall of modular botanical blooms, harmonic chimes, and copperplate study plates." />
+  <meta name="author" content="Kai Kleinbard" />
+  <meta name="creator" content="Kai Kleinbard" />
+  <meta name="copyright" content="Kai Kleinbard" />
+  <meta name="theme-color" content="#FDF0E7" />
+  <link rel="canonical" href="https://cre8ture.github.io/mechanic-botanic/" />
+
+  <!-- Browser & Touch Icons (Flower) -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+
+  <!-- Open Graph / Social Embed Metadata -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cre8ture.github.io/mechanic-botanic/" />
+  <meta property="og:site_name" content="Mechanic Botanic" />
+  <meta property="og:title" content="Mechanic Botanic — Kai Kleinbard" />
+  <meta property="og:description" content="An interactive 3D digital garden and vintage herbarium wall of modular botanical blooms, harmonic chimes, and copperplate study plates by Kai Kleinbard." />
+  <meta property="og:image" content="https://cre8ture.github.io/mechanic-botanic/og-image.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1376" />
+  <meta property="og:image:height" content="768" />
+  <meta property="og:image:alt" content="Mechanic Botanic — Interactive 3D Digital Garden &amp; Herbarium by Kai Kleinbard" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter / X Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://cre8ture.github.io/mechanic-botanic/" />
+  <meta name="twitter:title" content="Mechanic Botanic — Kai Kleinbard" />
+  <meta name="twitter:description" content="An interactive 3D digital garden and vintage herbarium wall of modular botanical blooms, harmonic chimes, and copperplate study plates by Kai Kleinbard." />
+  <meta name="twitter:image" content="https://cre8ture.github.io/mechanic-botanic/og-image.jpg" />
+  <meta name="twitter:image:alt" content="Mechanic Botanic — Interactive 3D Digital Garden &amp; Herbarium by Kai Kleinbard" />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Mechanic Botanic",
+    "url": "https://cre8ture.github.io/mechanic-botanic/",
+    "description": "An interactive 3D digital garden and vintage herbarium wall of modular botanical blooms, harmonic chimes, and copperplate study plates.",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Any",
+    "image": "https://cre8ture.github.io/mechanic-botanic/og-image.jpg",
+    "author": {
+      "@type": "Person",
+      "name": "Kai Kleinbard"
+    },
+    "creator": {
+      "@type": "Person",
+      "name": "Kai Kleinbard"
+    }
+  }
+  </script>
+
+  <!-- Tailwind CSS for clean, responsive UI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts: Inter for crisp UI, Cormorant Garamond & Pinyon Script for vintage botanical plates -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+
+  <!-- Three.js (r128) for 3D botanical rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Tone.js for musical botanical chimes & subtle X-ray static -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #FDF0E7;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1D637A;
+      user-select: none;
+    }
+
+    .font-serif-plate {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    .font-script-plate {
+      font-family: 'Pinyon Script', cursive;
+    }
+
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    #canvas-container:active {
+      cursor: grabbing;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Warm editorial glass pills */
+    .garden-pill {
+      background: rgba(253, 240, 231, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(29, 99, 122, 0.14);
+      box-shadow: 0 8px 24px rgba(29, 99, 122, 0.08);
+    }
+
+    .garden-btn {
+      transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .garden-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(29, 99, 122, 0.14);
+    }
+
+    .garden-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Vintage archival paper texture for Botany Wall & Study Plate */
+    .archival-paper {
+      background-color: #F7F2E8;
+      background-image:
+        radial-gradient(rgba(130, 108, 80, 0.055) 1px, transparent 0),
+        radial-gradient(rgba(29, 99, 122, 0.03) 1px, transparent 0),
+        linear-gradient(180deg, rgba(255, 252, 245, 0.7) 0%, rgba(242, 233, 218, 0.55) 100%);
+      background-size: 24px 24px, 13px 13px, 100% 100%;
+      background-position: 0 0, 7px 7px, 0 0;
+    }
+
+    /* Copperplate engraving double border */
+    .plate-frame {
+      border: 1px solid rgba(74, 63, 50, 0.26);
+      box-shadow:
+        inset 0 0 0 5px rgba(247, 242, 232, 0.9),
+        inset 0 0 0 6px rgba(74, 63, 50, 0.14),
+        0 14px 36px rgba(54, 43, 32, 0.1);
+    }
+
+    /* Masonry columns layout for Botany Wall */
+    .masonry-grid {
+      column-count: 1;
+      column-gap: 1.25rem;
+    }
+    @media (min-width: 600px) {
+      .masonry-grid { column-count: 2; }
+    }
+    @media (min-width: 960px) {
+      .masonry-grid { column-count: 3; }
+    }
+    @media (min-width: 1320px) {
+      .masonry-grid { column-count: 4; }
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 1.25rem;
+    }
+
+    /* X-ray static scanline + glitch overlay for Botany Wall & Plate clicks */
+    @keyframes staticFlicker {
+      0%   { opacity: 0.95; transform: translateX(0); }
+      15%  { opacity: 0.2;  transform: translateX(-2px); }
+      30%  { opacity: 1;    transform: translateX(2px); }
+      48%  { opacity: 0.85; transform: translateX(0); }
+      65%  { opacity: 0.95; transform: translateX(-1px); }
+      82%  { opacity: 0.25; transform: translateX(1px); }
+      92%  { opacity: 0.88; transform: translateX(0); }
+      100% { opacity: 0;    transform: translateX(0); }
+    }
+
+    .xray-static-active .img-xray {
+      opacity: 1 !important;
+      animation: staticFlicker 1.35s steps(2, end) forwards;
+    }
+
+    .xray-static-active .img-solid {
+      opacity: 0.14 !important;
+      filter: contrast(1.15) saturate(0.4);
+      transition: opacity 0.08s ease;
+    }
+
+    .static-scanlines {
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(29, 99, 122, 0.09) 0px,
+        rgba(29, 99, 122, 0.09) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .xray-static-active .static-scanlines {
+      opacity: 1;
+      animation: staticFlicker 1.35s steps(3, end) forwards;
+    }
+
+    /* Custom subtle scrollbar inside Botany Wall & Plate modal */
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(29, 99, 122, 0.2);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D Garden Viewport -->
+  <div id="canvas-container" aria-label="Interactive 3D Mechanic Botanic Garden"></div>
+
+  <!-- Top-Left Minimal Editorial Header (3D Garden View) -->
+  <div id="garden-header" class="fixed top-4 left-4 sm:top-6 sm:left-6 z-20 pointer-events-none max-w-[85vw] transition-opacity duration-300">
+    <div class="garden-pill rounded-2xl px-4 py-3 pointer-events-auto inline-flex flex-col gap-1.5">
+      <div class="flex items-center gap-2.5">
+        <span class="w-3.5 h-3.5 rounded-full bg-[#F4841A] border-2 border-[#FDF0E7] shadow-sm inline-block ring-1 ring-[#F4841A]/40"></span>
+        <h1 class="text-sm sm:text-base font-semibold tracking-tight text-[#1D637A]">
+          Mechanic Botanic
+        </h1>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#F4841A]" title="Marigold Orange"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#E26386]" title="Berry Pink"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#E51925]" title="Crimson Red"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#F7BF18]" title="Golden Yellow"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#1D637A]" title="Deep Teal"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#2E6F2B]" title="Forest Green"></span>
+        <span class="text-[11px] text-[#1D637A]/70 ml-1.5 font-medium hidden sm:inline">
+          Drag to orbit · Click any bloom
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTANY WALL OVERLAY (Vintage Botanical Mosaic) -->
+  <section id="botany-wall"
+    class="fixed inset-0 z-30 archival-paper hidden flex-col overflow-hidden transition-opacity duration-300">
+
+    <!-- Botany Wall Header -->
+    <header class="w-full border-b border-[#4A3F32]/15 bg-[#F7F2E8]/90 backdrop-blur-md px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
+      <div>
+        <div class="flex items-baseline gap-2.5">
+          <h2 class="font-serif-plate text-2xl sm:text-3xl font-semibold tracking-wide text-[#2C241B]">
+            Mechanic Botanic
+          </h2>
+          <span class="font-script-plate text-2xl sm:text-3xl text-[#1D637A]/80 leading-none">
+            Herbarium Studies
+          </span>
+        </div>
+        <p class="text-xs sm:text-sm text-[#5C4E3E]/80 font-serif-plate italic mt-0.5">
+          Click any plate to chime &amp; inspect its inner grid · Toggle specimens to cultivate in your garden
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <span id="wall-selection-count"
+          class="text-xs font-medium px-3 py-1.5 rounded-full bg-[#1D637A]/10 text-[#1D637A] border border-[#1D637A]/15">
+          9 in Garden
+        </span>
+        <button id="btn-close-wall"
+          class="garden-btn rounded-full px-4 py-2 text-xs sm:text-sm font-medium bg-[#1D637A] text-[#FDF0E7] hover:bg-[#175063] flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Return to Garden</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable Masonry Mosaic -->
+    <div class="flex-1 overflow-y-auto custom-scroll px-4 sm:px-8 py-6 pb-24">
+      <div id="botany-masonry" class="masonry-grid max-w-7xl mx-auto">
+        <!-- Populated dynamically with vintage brick-botanical study plates -->
+      </div>
+    </div>
+  </section>
+
+  <!-- DEDICATED BOTANICAL STUDY PLATE MODAL (Copperplate Specimen Page) -->
+  <section id="specimen-plate-modal"
+    class="fixed inset-0 z-40 hidden items-center justify-center p-3 sm:p-6 bg-[#2A221A]/55 backdrop-blur-sm overflow-y-auto">
+
+    <div class="relative w-full max-w-4xl my-auto archival-paper plate-frame rounded-sm p-5 sm:p-10 text-[#2C241B]">
+
+      <!-- Top Bar inside Plate -->
+      <div class="flex items-center justify-between mb-3 sm:mb-4">
+        <button id="btn-close-plate"
+          class="garden-btn rounded-full px-3.5 py-1.5 text-xs font-medium text-[#2C241B] bg-[#EFE7D8] hover:bg-[#E6DBC8] border border-[#4A3F32]/20 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Botany Wall</span>
+        </button>
+
+        <div class="flex items-center gap-3">
+          <button id="btn-plate-toggle-garden"
+            class="garden-btn rounded-full px-3.5 py-1.5 text-xs font-medium border transition-colors">
+            <!-- Dynamically updated -->
+          </button>
+          <span id="plate-tab-number" class="font-script-plate text-2xl sm:text-3xl text-[#3A3026] tracking-wide">
+            Tab. 718.
+          </span>
+        </div>
+      </div>
+
+      <!-- Copperplate Specimen Layout (Matches Vintage Botanical Study Engraving) -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 items-center">
+
+        <!-- Left / Main Hero Specimen (Full Stem, Leaves & Bloom) -->
+        <div class="md:col-span-7 flex flex-col items-center justify-center">
+          <div id="plate-hero-click"
+            class="relative w-full max-w-[380px] aspect-[4/5] flex items-center justify-center cursor-pointer group"
+            title="Click to hear chime & reveal inner grid">
+            <img id="plate-hero-solid" alt="Botanical Specimen" class="img-solid w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]" />
+            <img id="plate-hero-xray" alt="Specimen Inner Grid" class="img-xray absolute inset-0 w-full h-full object-contain opacity-0 pointer-events-none" />
+            <div class="static-scanlines absolute inset-0 rounded"></div>
+          </div>
+          <span class="font-serif-plate italic text-[11px] text-[#5C4E3E]/70 mt-1">
+            Click specimen to sound harmonic chime &amp; inner grid
+          </span>
+        </div>
+
+        <!-- Right Column: Dissected Botanical Anatomy Studies -->
+        <div class="md:col-span-5 flex flex-col gap-5 sm:gap-6 md:border-l md:border-[#4A3F32]/12 md:pl-6">
+
+          <!-- Top Dissection Row: Stamen & Corolla Cross-Section -->
+          <div>
+            <div class="grid grid-cols-2 gap-3 items-end">
+              <div class="flex flex-col items-center">
+                <div class="w-24 h-28 sm:w-28 sm:h-32 flex items-center justify-center">
+                  <img id="plate-part-stamen" alt="Stamen Study" class="w-full h-full object-contain" />
+                </div>
+                <span class="font-serif-plate italic text-xs text-[#4A3F32]/80 mt-1">Fig. 1. Stamen</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
+                  <img id="plate-part-corolla" alt="Corolla Study" class="w-full h-full object-contain" />
+                </div>
+                <span class="font-serif-plate italic text-xs text-[#4A3F32]/80 mt-1">Fig. 2. Corolla</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mid Dissection Row: Calyx, Bud & Seed Stud Stages -->
+          <div class="pt-3 border-t border-[#4A3F32]/12">
+            <div class="grid grid-cols-3 gap-2 items-end">
+              <div class="flex flex-col items-center">
+                <div class="w-20 h-20 flex items-center justify-center">
+                  <img id="plate-part-calyx" alt="Calyx Study" class="w-full h-full object-contain" />
+                </div>
+                <span class="font-serif-plate italic text-[11px] text-[#4A3F32]/75">Calyx</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="w-20 h-20 flex items-center justify-center">
+                  <img id="plate-part-leaf" alt="Foliage Study" class="w-full h-full object-contain" />
+                </div>
+                <span class="font-serif-plate italic text-[11px] text-[#4A3F32]/75">Folium</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="w-16 h-16 flex items-center justify-center">
+                  <img id="plate-part-seed" alt="Seed Stud Study" class="w-full h-full object-contain" />
+                </div>
+                <span class="font-serif-plate italic text-[11px] text-[#4A3F32]/75">Semen</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botanical Field Notes -->
+          <div class="pt-3 border-t border-[#4A3F32]/12">
+            <p id="plate-notes" class="font-serif-plate text-sm leading-relaxed text-[#4A3F32]/85 italic">
+              <!-- Populated per species -->
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Engraving Typography (Latin Serif + Flowing Old Script) -->
+      <div class="mt-6 sm:mt-8 pt-4 border-t border-[#4A3F32]/12 text-center">
+        <h3 id="plate-latin-name" class="font-serif-plate text-2xl sm:text-3xl tracking-wide text-[#241D16]">
+          Phlox divaricata.
+        </h3>
+        <p id="plate-script-name" class="font-script-plate text-3xl sm:text-4xl text-[#3A3026] -mt-1">
+          Auseinandergesperrte Flammenblume.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Bottom-Center Control Bar (3D Garden View) -->
+  <div id="garden-controls" class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 w-auto max-w-[94vw] transition-opacity duration-300">
+    <div class="garden-pill rounded-full p-1.5 flex items-center gap-1.5 sm:gap-2">
+
+      <!-- Botany Wall Mode Button -->
+      <button id="btn-botany-wall"
+        class="garden-btn rounded-full px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium text-[#FDF0E7] bg-[#1D637A] hover:bg-[#175063] flex items-center gap-1.5 whitespace-nowrap">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 11a1 1 0 011-1h4a1 1 0 011 1v8a1 1 0 01-1 1h-4a1 1 0 01-1-1v-8z" />
+        </svg>
+        <span>Botany Wall</span>
+      </button>
+
+      <!-- Plant New Bloom Button -->
+      <button id="btn-plant"
+        class="garden-btn rounded-full px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium text-[#1D637A] bg-[#FDF0E7]/90 hover:bg-white border border-[#1D637A]/15 flex items-center gap-1.5 whitespace-nowrap">
+        <svg class="w-3.5 h-3.5 text-[#2E6F2B]" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Plant</span>
+      </button>
+
+      <!-- Refresh Garden Button -->
+      <button id="btn-refresh"
+        class="garden-btn rounded-full px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-medium text-[#1D637A] bg-[#FDF0E7]/90 hover:bg-white border border-[#1D637A]/15 flex items-center gap-1.5 whitespace-nowrap"
+        title="Reset garden to fresh blooms">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span class="hidden sm:inline">Refresh</span>
+      </button>
+
+      <!-- Sound Toggle (Enabled by default so clicks chime immediately) -->
+      <button id="btn-sound"
+        class="garden-btn rounded-full p-2 text-[#1D637A] bg-[#FDF0E7]/90 hover:bg-white border border-[#1D637A]/15 flex items-center justify-center"
+        aria-label="Toggle Harmonic Chime Sound"
+        title="Toggle harmonic sound">
+        <svg id="icon-sound-off" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+        </svg>
+        <svg id="icon-sound-on" class="w-4 h-4 text-[#F4841A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Subtle Toast Notification (never uses alert) -->
+  <div id="toast-msg"
+    class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-2">
+    <div class="garden-pill rounded-full px-4 py-1.5 text-xs font-medium text-[#1D637A]"></div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * MECHANIC BOTANIC — DIGITAL GARDEN & HERBARIUM WALL
+     * ============================================================================
+     * Features:
+     * 1. Warm floral palette with brick-built botanical specimens.
+     * 2. Immediate full bloom on open (no drop-in construction animation).
+     * 3. Living Lifecycle:
+     *    - Flowers gradually grow taller over time with new stem joints.
+     *    - Over time, petals detach and flutter gently to the garden floor.
+     *    - Mature blooms can sprout a fresh secondary side-stem & new bud.
+     * 4. Harmonic Botanical Chimes (Tone.js) + Static X-Ray Inner Grid on click
+     *    (plus rare autonomous X-ray flickers in the 3D garden).
+     * 5. Botany Wall Mode: Vintage botanical study mosaic where default species
+     *    are selected, additional species can be toggled into the garden, clicking
+     *    plays the chime + X-ray static, and the info button opens a dedicated
+     *    copperplate botanical study sheet with brick-built anatomical dissections.
+     */
+
+    // ---------------------------------------------------------------------------
+    // 1. COLOR PALETTE
+    // ---------------------------------------------------------------------------
+    const PALETTE = {
+      BG:         0xFDF0E7, // Soft warm blush-cream background
+      BASEPLATE:  0xF7E3D5, // Studded baseplate
+      BASE_TRIM:  0xEED5C4, // Baseplate rim
+      ORANGE:     0xF4841A, // Marigold hibiscus orange
+      PINK:       0xE26386, // Berry petal pink
+      LIGHT_PINK: 0xF3B3C1, // Soft blush bud pink
+      RED:        0xE51925, // Crimson floral red
+      YELLOW:     0xF7BF18, // Golden yellow clusters
+      TEAL:       0x1D637A, // Deep petrol teal leaves & centers
+      GREEN:      0x2E6F2B, // Forest botanical green leaves & stems
+      BLUE:       0x3B76D6, // Classic Phlox divaricata cerulean blue
+      XRAY_LINE:  0x1D637A, // Blueprint deep teal wireframe
+      XRAY_GLOW:  0x2AA3C4, // Cyan-teal inner grid lines
+      XRAY_CORE:  0xE51925  // Technical central axis highlight
+    };
+
+    // ---------------------------------------------------------------------------
+    // 2. SPECIES CATALOG (For 3D Garden, Botany Wall & Dedicated Study Plates)
+    // ---------------------------------------------------------------------------
+    const SPECIES_CATALOG = [
+      {
+        id: 'hibiscus_orange',
+        tab: 'Tab. 101.',
+        latin: 'Hibiscus solaris.',
+        script: 'Sonnengold-Eibisch.',
+        archetype: 'hibiscus',
+        petalColor: 'ORANGE',
+        centerColor: 'RED',
+        stemColor: 'GREEN',
+        leafColor: 'GREEN',
+        defaultSelected: true,
+        chord: ['C5', 'E5', 'G5', 'B5'],
+        aspectClass: 'aspect-[4/5]',
+        notes: 'Five scalloped interlocking plates radiating around a crimson stud pistil. Known to elongate steadily toward studio light before shedding outer plates.'
+      },
+      {
+        id: 'hydrangea_yellow',
+        tab: 'Tab. 108.',
+        latin: 'Hydrangea aurea.',
+        script: 'Goldene Doldenblume.',
+        archetype: 'hydrangea',
+        petalColor: 'YELLOW',
+        centerColor: 'GREEN',
+        stemColor: 'GREEN',
+        leafColor: 'GREEN',
+        defaultSelected: true,
+        chord: ['D5', 'F#5', 'A5', 'E6'],
+        aspectClass: 'aspect-[4/4]',
+        notes: 'A Fibonacci lattice of twenty-six cylindrical golden studs anchored to an internal green structural block. Frequently sprouts secondary shoots.'
+      },
+      {
+        id: 'hibiscus_red',
+        tab: 'Tab. 114.',
+        latin: 'Hibiscus coccineus.',
+        script: 'Karminroter Blütenkelch.',
+        archetype: 'hibiscus',
+        petalColor: 'RED',
+        centerColor: 'ORANGE',
+        stemColor: 'GREEN',
+        leafColor: 'TEAL',
+        defaultSelected: true,
+        chord: ['E5', 'G#5', 'B5', 'D#6'],
+        aspectClass: 'aspect-[4/5]',
+        notes: 'Deep crimson modular petals paired with marigold stamen pins. Its inner structural grid reveals a strict radial symmetry beneath the glossy bevels.'
+      },
+      {
+        id: 'daisy_pink',
+        tab: 'Tab. 122.',
+        latin: 'Cosmos rosea.',
+        script: 'Beerenfarbener Stern.',
+        archetype: 'daisy',
+        petalColor: 'PINK',
+        centerColor: 'RED',
+        stemColor: 'TEAL',
+        leafColor: 'TEAL',
+        defaultSelected: true,
+        chord: ['F5', 'A5', 'C6', 'E6'],
+        aspectClass: 'aspect-[4/4]',
+        notes: 'Five slender berry-pink rays clasped to a crimson central hub, supported by twin petrol-teal foliar blades.'
+      },
+      {
+        id: 'hydrangea_pink',
+        tab: 'Tab. 135.',
+        latin: 'Hydrangea rubella.',
+        script: 'Zarte Rosenkugel.',
+        archetype: 'hydrangea',
+        petalColor: 'PINK',
+        centerColor: 'LIGHT_PINK',
+        stemColor: 'GREEN',
+        leafColor: 'GREEN',
+        defaultSelected: true,
+        chord: ['G5', 'B5', 'D6', 'F#6'],
+        aspectClass: 'aspect-[4/5]',
+        notes: 'Speckled umbel combining berry and morning-blush cylindrical plates. Each floret detaches individually during late seasonal cycles.'
+      },
+      {
+        id: 'daisy_orange',
+        tab: 'Tab. 142.',
+        latin: 'Calendula marina.',
+        script: 'Ringelblume am Meer.',
+        archetype: 'daisy',
+        petalColor: 'ORANGE',
+        centerColor: 'TEAL',
+        stemColor: 'TEAL',
+        leafColor: 'TEAL',
+        defaultSelected: true,
+        chord: ['A4', 'E5', 'G5', 'B5'],
+        aspectClass: 'aspect-[4/4]',
+        notes: 'Bright marigold rays contrasting against a deep petrol-teal center stud. Produces a warm fifth-interval chime when resonant.'
+      },
+      {
+        id: 'hydrangea_orange',
+        tab: 'Tab. 156.',
+        latin: 'Hydrangea aurantia.',
+        script: 'Bernstein-Traube.',
+        archetype: 'hydrangea',
+        petalColor: 'ORANGE',
+        centerColor: 'GREEN',
+        stemColor: 'GREEN',
+        leafColor: 'GREEN',
+        defaultSelected: true,
+        chord: ['C5', 'G5', 'B5', 'D6'],
+        aspectClass: 'aspect-[4/4]',
+        notes: 'Compact amber dome built upon an architectural core. Well suited to lower garden strata and rapid lateral shoot formation.'
+      },
+      {
+        id: 'tulip_pink',
+        tab: 'Tab. 164.',
+        latin: 'Tulipa baccata.',
+        script: 'Beerenkelch-Tulpe.',
+        archetype: 'tulip',
+        petalColor: 'PINK',
+        centerColor: 'LIGHT_PINK',
+        stemColor: 'TEAL',
+        leafColor: 'TEAL',
+        defaultSelected: true,
+        chord: ['D5', 'A5', 'C#6', 'E6'],
+        aspectClass: 'aspect-[4/5]',
+        notes: 'Four upright cupped plates nestled inside a teal cylindrical sepal. Retains its inner core stud long after outer petals drift away.'
+      },
+      {
+        id: 'tulip_blush',
+        tab: 'Tab. 171.',
+        latin: 'Tulipa pallida.',
+        script: 'Morgenröte-Knospe.',
+        archetype: 'tulip',
+        petalColor: 'LIGHT_PINK',
+        centerColor: 'PINK',
+        stemColor: 'TEAL',
+        leafColor: 'TEAL',
+        defaultSelected: true,
+        chord: ['E5', 'B5', 'D6', 'F#6'],
+        aspectClass: 'aspect-[4/5]',
+        notes: 'Delicate blush-cream enclosure shielding a darker berry inner stud. Often grows an auxiliary bud stem mid-way along its stalk.'
+      },
+      // --- Additional Unselected Specimens (User can select in Botany Wall to add to Garden) ---
+      {
+        id: 'phlox_blue',
+        tab: 'Tab. 718.',
+        latin: 'Phlox divaricata.',
+        script: 'Auseinandergesperrte Flammenblume.',
+        archetype: 'daisy',
+        petalColor: 'BLUE',
+        centerColor: 'TEAL',
+        stemColor: 'GREEN',
+        leafColor: 'GREEN',
+        defaultSelected: false,
+        chord: ['F4', 'C5', 'E5', 'A5', 'C6'],
+        aspectClass: 'aspect-[4/5]',
+        notes: 'Woodland cerulean phlox rendered in interlocking five-ray plates atop opposing forest-green leaves. Studied extensively for its crystalline harmonic tone.'
+      },
+      {
+        id: 'daisy_yellow',
+        tab: 'Tab. 204.',
+        latin: 'Anthemis aureola.',
+        script: 'Sonnenkrone der Wiese.',
+        archetype: 'daisy',
+        petalColor: 'YELLOW',
+        centerColor: 'TEAL',
+        stemColor: 'GREEN',
+        leafColor: 'GREEN',
+        defaultSelected: false,
+        chord: ['G4', 'D5', 'F#5', 'B5'],
+        aspectClass: 'aspect-[4/4]',
+        notes: 'Luminous golden rays anchored to a deep teal stud. Grows tall and slender over extended observation periods.'
+      },
+      {
+        id: 'tulip_red',
+        tab: 'Tab. 219.',
+        latin: 'Tulipa flammea.',
+        script: 'Scharlachroter Kelch.',
+        archetype: 'tulip',
+        petalColor: 'RED',
+        centerColor: 'ORANGE',
+        stemColor: 'GREEN',
+        leafColor: 'GREEN',
+        defaultSelected: false,
+        chord: ['A4', 'C#5', 'E5', 'G#5'],
+        aspectClass: 'aspect-[4/5]',
+        notes: 'A vivid scarlet chalice supported by forest-green brickwork. Its inner grid exposes four angled hinge planes.'
+      }
+    ];
+
+    const SPECIES_MAP = Object.fromEntries(SPECIES_CATALOG.map((s) => [s.id, s]));
+
+    // Track which species are currently selected in the Botany Wall
+    const selectedSpecies = new Set(
+      SPECIES_CATALOG.filter((s) => s.defaultSelected).map((s) => s.id)
+    );
+
+    // ---------------------------------------------------------------------------
+    // 3. GLOBAL STATE
+    // ---------------------------------------------------------------------------
+    let scene, camera, renderer, raycaster;
+    let gardenGroup, baseplateGroup, fallenGroup;
+    let flowers = [];
+    let fallingPetals = [];
+    let clock = new THREE.Clock();
+    let elapsedTime = 0;
+    let flowerIdCounter = 1;
+
+    // Camera orbit state
+    const camState = {
+      theta: 0.65,
+      phi: 1.04,
+      radius: 19.5,
+      targetTheta: 0.65,
+      targetPhi: 1.04,
+      targetRadius: 19.5,
+      targetLookAt: new THREE.Vector3(0, 2.5, 0),
+      isDragging: false,
+      lastX: 0,
+      lastY: 0,
+      pointerDownX: 0,
+      pointerDownY: 0,
+      pinchStartDist: 0,
+      pinchStartRadius: 19.5,
+      autoRotate: true,
+      lastInteractionTime: 0
+    };
+
+    // Rare Autonomous X-Ray Scheduler
+    const xrayState = {
+      nextTriggerTime: 10.0,
+      activeFlower: null
+    };
+
+    // Audio State (Enabled by default; unlocks automatically on first interaction)
+    let soundEnabled = true;
+    let chimeSynth = null;
+    let staticSynth = null;
+    let petalTapSynth = null;
+    let audioReady = false;
+
+    // Shared Materials & Geometries
+    const MATERIALS = {};
+    const GEOS = {};
+
+    // Offscreen Snapshot Renderer Cache (for Botany Wall & Dedicated Study Plates)
+    let snapshotRenderer = null;
+    const snapshotCache = new Map();
+    const plateDissectionCache = new Map();
+    let wallBuilt = false;
+    let activePlateSpeciesId = null;
+
+    // ---------------------------------------------------------------------------
+    // 4. BEAUTIFUL BOTANICAL CHIME & STATIC AUDIO ENGINE (Tone.js)
+    // ---------------------------------------------------------------------------
+    async function ensureAudioStarted() {
+      if (!soundEnabled) return false;
+      try {
+        if (Tone.context.state !== 'running') {
+          await Tone.start();
+        }
+        if (!audioReady) {
+          // Lush reverberant space
+          const reverb = new Tone.Reverb({ decay: 3.4, wet: 0.42 }).toDestination();
+          const delay = new Tone.FeedbackDelay({ delayTime: '8n.', feedback: 0.22, wet: 0.2 }).connect(reverb);
+
+          // Warm bell-harp polyphonic synthesizer
+          chimeSynth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'triangle' },
+            envelope: {
+              attack: 0.015,
+              decay: 0.55,
+              sustain: 0.18,
+              release: 2.1
+            }
+          }).connect(delay);
+          chimeSynth.volume.value = -11;
+
+          // Subtle soft static crackle for X-ray grid flicker
+          const filter = new Tone.Filter(2400, 'bandpass').toDestination();
+          staticSynth = new Tone.NoiseSynth({
+            noise: { type: 'pink' },
+            envelope: { attack: 0.005, decay: 0.09, sustain: 0.02, release: 0.08 }
+          }).connect(filter);
+          staticSynth.volume.value = -28;
+
+          // Delicate soft tap sound when a shed petal lands on the baseplate
+          petalTapSynth = new Tone.Synth({
+            oscillator: { type: 'sine' },
+            envelope: {
+              attack: 0.002,
+              decay: 0.055,
+              sustain: 0.0,
+              release: 0.04
+            }
+          }).connect(reverb);
+          petalTapSynth.volume.value = -19;
+
+          audioReady = true;
+        }
+        return true;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    async function playFlowerChime(speciesId) {
+      if (!soundEnabled) return;
+      const ok = await ensureAudioStarted();
+      if (!ok || !chimeSynth) return;
+
+      const spec = SPECIES_MAP[speciesId] || SPECIES_CATALOG[0];
+      const notes = spec.chord;
+      const now = Tone.now();
+
+      try {
+        // Gentle harp-like rolled arpeggio
+        notes.forEach((note, idx) => {
+          chimeSynth.triggerAttackRelease(note, '2n', now + idx * 0.068, 0.55 - idx * 0.06);
+        });
+        // Soft whisper of static alongside the X-ray flicker
+        if (staticSynth) {
+          staticSynth.triggerAttackRelease('16n', now + 0.03);
+        }
+      } catch (e) {}
+    }
+
+    function playSubtleStaticTick() {
+      if (!soundEnabled || !audioReady || !staticSynth) return;
+      try {
+        staticSynth.triggerAttackRelease('32n');
+      } catch (e) {}
+    }
+
+    function playPetalLandSound() {
+      if (!soundEnabled || !audioReady || !petalTapSynth) return;
+      try {
+        const tapNotes = ['D6', 'E6', 'G6', 'A6', 'B6', 'D7'];
+        const note = tapNotes[Math.floor(Math.random() * tapNotes.length)];
+        petalTapSynth.triggerAttackRelease(note, '32n', undefined, 0.35 + Math.random() * 0.25);
+      } catch (e) {}
+    }
+
+    // ---------------------------------------------------------------------------
+    // 5. SHARED MATERIALS & BRICK GEOMETRIES
+    // ---------------------------------------------------------------------------
+    function initResources() {
+      const plasticColors = ['ORANGE', 'PINK', 'LIGHT_PINK', 'RED', 'YELLOW', 'TEAL', 'GREEN', 'BLUE'];
+      plasticColors.forEach((key) => {
+        MATERIALS[key] = new THREE.MeshPhysicalMaterial({
+          color: PALETTE[key],
+          roughness: 0.22,
+          metalness: 0.02,
+          clearcoat: 0.65,
+          clearcoatRoughness: 0.16
+        });
+      });
+
+      MATERIALS.BASEPLATE = new THREE.MeshStandardMaterial({
+        color: PALETTE.BASEPLATE,
+        roughness: 0.68,
+        metalness: 0.02
+      });
+
+      MATERIALS.BASE_TRIM = new THREE.MeshStandardMaterial({
+        color: PALETTE.BASE_TRIM,
+        roughness: 0.72,
+        metalness: 0.02
+      });
+
+      MATERIALS.XRAY_EDGE = new THREE.LineBasicMaterial({
+        color: PALETTE.XRAY_LINE,
+        transparent: true,
+        opacity: 0.88
+      });
+
+      MATERIALS.XRAY_GRID = new THREE.LineBasicMaterial({
+        color: PALETTE.XRAY_GLOW,
+        transparent: true,
+        opacity: 0.58
+      });
+
+      MATERIALS.XRAY_CORE = new THREE.LineBasicMaterial({
+        color: PALETTE.XRAY_CORE,
+        transparent: true,
+        opacity: 0.82
+      });
+
+      MATERIALS.XRAY_GHOST = new THREE.MeshBasicMaterial({
+        color: PALETTE.XRAY_GLOW,
+        transparent: true,
+        opacity: 0.08,
+        depthWrite: false
+      });
+
+      // Modular Brick Geometries
+      GEOS.stud           = new THREE.CylinderGeometry(0.11, 0.11, 0.08, 12);
+      GEOS.stemSeg        = new THREE.CylinderGeometry(0.145, 0.145, 0.46, 12);
+      GEOS.roundPlate1x1  = new THREE.CylinderGeometry(0.24, 0.24, 0.16, 16);
+      GEOS.round1x1       = new THREE.CylinderGeometry(0.24, 0.24, 0.34, 16);
+      GEOS.brick1x1       = new THREE.BoxGeometry(0.46, 0.44, 0.46);
+      GEOS.plate1x2       = new THREE.BoxGeometry(0.42, 0.16, 0.82);
+      GEOS.stamenPin      = new THREE.CylinderGeometry(0.032, 0.032, 0.36, 8);
+      GEOS.stamenTip      = new THREE.CylinderGeometry(0.065, 0.055, 0.10, 10);
+      GEOS.tileRoundSmall = new THREE.CylinderGeometry(0.20, 0.20, 0.08, 14);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 6. PAIRED SOLID + X-RAY BRICK BUILDER HELPERS
+    // ---------------------------------------------------------------------------
+    function createPairedPivot(flowerData, pos = [0, 0, 0], rot = [0, 0, 0], parentLocal = null) {
+      const solid = new THREE.Group();
+      const xray = new THREE.Group();
+
+      solid.position.set(pos[0], pos[1], pos[2]);
+      solid.rotation.set(rot[0], rot[1], rot[2]);
+
+      xray.position.set(pos[0], pos[1], pos[2]);
+      xray.rotation.set(rot[0], rot[1], rot[2]);
+
+      const parentSolid = parentLocal ? parentLocal.solid : flowerData.solidGroup;
+      const parentXray = parentLocal ? parentLocal.xray : flowerData.xrayGroup;
+
+      parentSolid.add(solid);
+      parentXray.add(xray);
+
+      return { solid, xray };
+    }
+
+    function addBrickPart(flowerData, opts) {
+      const {
+        geo,
+        colorKey,
+        pos = [0, 0, 0],
+        rot = [0, 0, 0],
+        scale = [1, 1, 1],
+        studs = [],
+        parentLocal = null
+      } = opts;
+
+      const parentSolid = parentLocal ? parentLocal.solid : flowerData.solidGroup;
+      const parentXray = parentLocal ? parentLocal.xray : flowerData.xrayGroup;
+
+      // Solid glossy brick mesh
+      const solidMesh = new THREE.Mesh(geo, MATERIALS[colorKey] || MATERIALS.GREEN);
+      solidMesh.position.set(pos[0], pos[1], pos[2]);
+      solidMesh.rotation.set(rot[0], rot[1], rot[2]);
+      solidMesh.scale.set(scale[0], scale[1], scale[2]);
+      solidMesh.castShadow = true;
+      solidMesh.receiveShadow = true;
+      solidMesh.userData.flowerId = flowerData.id;
+
+      // X-ray wireframe + translucent ghost fill
+      const xrayGroup = new THREE.Group();
+      xrayGroup.position.set(pos[0], pos[1], pos[2]);
+      xrayGroup.rotation.set(rot[0], rot[1], rot[2]);
+      xrayGroup.scale.set(scale[0], scale[1], scale[2]);
+
+      const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 18), MATERIALS.XRAY_EDGE);
+      const ghost = new THREE.Mesh(geo, MATERIALS.XRAY_GHOST);
+      ghost.userData.flowerId = flowerData.id;
+      xrayGroup.add(edges, ghost);
+
+      // Attach top studs
+      for (let i = 0; i < studs.length; i++) {
+        const [sx, sy, sz] = studs[i];
+        const studMesh = new THREE.Mesh(GEOS.stud, MATERIALS[colorKey] || MATERIALS.GREEN);
+        studMesh.position.set(sx, sy, sz);
+        studMesh.castShadow = true;
+        studMesh.receiveShadow = true;
+        studMesh.userData.flowerId = flowerData.id;
+        solidMesh.add(studMesh);
+
+        const studEdges = new THREE.LineSegments(new THREE.EdgesGeometry(GEOS.stud, 24), MATERIALS.XRAY_EDGE);
+        studEdges.position.set(sx, sy, sz);
+        xrayGroup.add(studEdges);
+      }
+
+      parentSolid.add(solidMesh);
+      parentXray.add(xrayGroup);
+
+      return { solid: solidMesh, xray: xrayGroup };
+    }
+
+    function buildInnerConstructionGrid(flowerData, headY, radius, headContainer) {
+      // Central vertical technical axis line inside the stem
+      const axisPts = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, headY + 0.55, 0)];
+      const axisGeo = new THREE.BufferGeometry().setFromPoints(axisPts);
+      flowerData.xrayGroup.add(new THREE.Line(axisGeo, MATERIALS.XRAY_CORE));
+
+      // Radial coordinate grid & construction rings anchored to the flower head
+      const gridTarget = headContainer ? headContainer.xray : flowerData.xrayGroup;
+      const ringSegments = 28;
+      [radius * 0.55, radius].forEach((r) => {
+        const pts = [];
+        for (let i = 0; i <= ringSegments; i++) {
+          const a = (i / ringSegments) * Math.PI * 2;
+          pts.push(new THREE.Vector3(Math.cos(a) * r, 0.1, Math.sin(a) * r));
+        }
+        const ringGeo = new THREE.BufferGeometry().setFromPoints(pts);
+        gridTarget.add(new THREE.Line(ringGeo, MATERIALS.XRAY_GRID));
+      });
+
+      // Orthogonal construction crosshairs
+      const crossPts = [
+        new THREE.Vector3(-radius * 1.1, 0.1, 0), new THREE.Vector3(radius * 1.1, 0.1, 0),
+        new THREE.Vector3(0, 0.1, -radius * 1.1), new THREE.Vector3(0, 0.1, radius * 1.1)
+      ];
+      const crossGeo = new THREE.BufferGeometry().setFromPoints(crossPts);
+      gridTarget.add(new THREE.LineSegments(crossGeo, MATERIALS.XRAY_GRID));
+    }
+
+    // ---------------------------------------------------------------------------
+    // 7. BOTANICAL ARCHETYPE BUILDERS (With Growth Rig & Detachable Petals)
+    // ---------------------------------------------------------------------------
+    const SEG_H = 0.44;
+
+    function buildStemAndLeaves(flowerData, stemSegCount, stemColorKey, leafColorKey, leafStyle, deterministic = false) {
+      // Base socket plate
+      addBrickPart(flowerData, {
+        geo: GEOS.roundPlate1x1,
+        colorKey: stemColorKey,
+        pos: [0, 0.05, 0]
+      });
+
+      // Lower stem segments
+      for (let i = 0; i < stemSegCount; i++) {
+        addBrickPart(flowerData, {
+          geo: GEOS.stemSeg,
+          colorKey: stemColorKey,
+          pos: [0, 0.28 + i * SEG_H, 0]
+        });
+      }
+
+      // Leaves along the stem
+      const leafCount = stemSegCount >= 6 ? 2 : 1;
+      for (let l = 0; l < leafCount; l++) {
+        const yAttach = 0.72 + l * (stemSegCount * SEG_H * 0.36);
+        const angleY = deterministic ? (l * Math.PI + 0.5) : (l * Math.PI * 1.15 + Math.random() * 0.9);
+        const leafPivot = createPairedPivot(flowerData, [0, yAttach, 0], [0, angleY, 0]);
+
+        if (leafStyle === 'fern') {
+          const subAngles = [-0.46, -0.23, 0, 0.23, 0.46];
+          subAngles.forEach((a, idx) => {
+            const frondPivot = createPairedPivot(flowerData, [0, 0, 0.14], [0.42, a, 0], leafPivot);
+            const lenScale = idx === 2 ? 1.25 : (idx === 1 || idx === 3 ? 1.05 : 0.78);
+            addBrickPart(flowerData, {
+              geo: GEOS.plate1x2,
+              colorKey: leafColorKey,
+              pos: [0, 0, 0.36 * lenScale],
+              scale: [0.55, 0.75, lenScale],
+              studs: [[0, 0.18, 0.2], [0, 0.18, -0.2]],
+              parentLocal: frondPivot
+            });
+          });
+        } else {
+          [-0.44, 0.44].forEach((sideAngle) => {
+            const bladePivot = createPairedPivot(flowerData, [0, 0, 0.12], [0.45, sideAngle, 0], leafPivot);
+            addBrickPart(flowerData, {
+              geo: GEOS.plate1x2,
+              colorKey: leafColorKey,
+              pos: [0, 0, 0.38],
+              scale: [0.78, 0.85, 0.95],
+              studs: [[0, 0.18, 0.18], [0, 0.18, -0.18]],
+              parentLocal: bladePivot
+            });
+            addBrickPart(flowerData, {
+              geo: GEOS.roundPlate1x1,
+              colorKey: leafColorKey,
+              pos: [0, 0, 0.78],
+              scale: [0.75, 0.85, 0.75],
+              studs: [[0, 0.14, 0]],
+              parentLocal: bladePivot
+            });
+          });
+        }
+      }
+
+      // Seat head flush on the top of the uppermost stem segment (no gap)
+      const stemHeight = 0.28 + (stemSegCount - 1) * SEG_H + 0.18;
+
+      // Upper Head Container (moves smoothly upward as the flower grows taller over time)
+      const headContainer = createPairedPivot(flowerData, [0, stemHeight, 0], [0, 0, 0]);
+
+      // Internal telescoping stem neck moves with headContainer so growth never opens a gap
+      addBrickPart(flowerData, {
+        geo: GEOS.stemSeg,
+        colorKey: stemColorKey,
+        pos: [0, -0.24, 0],
+        scale: [0.96, 1.25, 0.96],
+        parentLocal: headContainer
+      });
+
+      flowerData.headContainer = headContainer;
+      flowerData.baseStemHeight = stemHeight;
+      flowerData.currentStemSegs = stemSegCount;
+
+      return { stemHeight, headContainer };
+    }
+
+    function buildFlowerGeometry(flowerData, spec, stemSegs, deterministic = false) {
+      const leafStyle = spec.archetype === 'hibiscus' || spec.archetype === 'hydrangea' ? 'fern' : 'twin';
+      const { stemHeight, headContainer } = buildStemAndLeaves(
+        flowerData, stemSegs, spec.stemColor, spec.leafColor, leafStyle, deterministic
+      );
+
+      const tiltX = deterministic ? 0.22 : (Math.random() - 0.5) * 0.35;
+      const tiltY = deterministic ? 0.35 : Math.random() * Math.PI * 2;
+      const tiltZ = deterministic ? -0.1 : (Math.random() - 0.5) * 0.35;
+      const headPivot = createPairedPivot(flowerData, [0, 0, 0], [tiltX, tiltY, tiltZ], headContainer);
+
+      if (spec.archetype === 'hibiscus') {
+        addBrickPart(flowerData, {
+          geo: GEOS.round1x1,
+          colorKey: spec.stemColor,
+          pos: [0, 0, 0],
+          scale: [1.3, 1.0, 1.3],
+          parentLocal: headPivot
+        });
+
+        for (let i = 0; i < 5; i++) {
+          const a = (i / 5) * Math.PI * 2;
+          const pPivot = createPairedPivot(flowerData, [0, 0.08, 0], [0, a, 0], headPivot);
+
+          addBrickPart(flowerData, {
+            geo: GEOS.plate1x2,
+            colorKey: spec.petalColor,
+            pos: [0, 0.06, 0.42],
+            rot: [-0.28, 0, 0],
+            scale: [1.15, 1, 0.9],
+            studs: [[0, 0.18, 0.18], [0, 0.18, -0.18]],
+            parentLocal: pPivot
+          });
+
+          [-0.2, 0.2].forEach((ox) => {
+            addBrickPart(flowerData, {
+              geo: GEOS.roundPlate1x1,
+              colorKey: spec.petalColor,
+              pos: [ox, 0.19, 0.84],
+              rot: [-0.42, 0, 0],
+              scale: [1.22, 1.1, 1.22],
+              studs: [[0, 0.15, 0]],
+              parentLocal: pPivot
+            });
+          });
+
+          // Track detachable petal assembly
+          flowerData.petals.push({ paired: pPivot, shed: false });
+        }
+
+        addBrickPart(flowerData, {
+          geo: GEOS.round1x1,
+          colorKey: spec.centerColor,
+          pos: [0, 0.18, 0],
+          scale: [1.15, 0.9, 1.15],
+          studs: [[0, 0.24, 0]],
+          parentLocal: headPivot
+        });
+
+        for (let s = 0; s < 3; s++) {
+          const sa = (s / 3) * Math.PI * 2 + 0.4;
+          const stPivot = createPairedPivot(flowerData, [0, 0.30, 0], [0.22, sa, 0], headPivot);
+          addBrickPart(flowerData, {
+            geo: GEOS.stamenPin,
+            colorKey: spec.centerColor,
+            pos: [0, 0.18, 0.08],
+            parentLocal: stPivot
+          });
+          addBrickPart(flowerData, {
+            geo: GEOS.stamenTip,
+            colorKey: spec.centerColor === 'RED' ? 'YELLOW' : 'RED',
+            pos: [0, 0.36, 0.08],
+            parentLocal: stPivot
+          });
+        }
+
+        buildInnerConstructionGrid(flowerData, stemHeight, 1.28, headContainer);
+
+      } else if (spec.archetype === 'hydrangea') {
+        headPivot.solid.position.y = 0.14;
+        headPivot.xray.position.y = 0.14;
+
+        addBrickPart(flowerData, {
+          geo: GEOS.brick1x1,
+          colorKey: 'GREEN',
+          pos: [0, 0, 0],
+          scale: [1.35, 1.25, 1.35],
+          parentLocal: headPivot
+        });
+
+        const count = 26;
+        const radius = 0.72;
+        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+        for (let i = 0; i < count; i++) {
+          const y = 1 - (i / (count - 1)) * 1.65;
+          const r = Math.sqrt(Math.max(0, 1 - y * y));
+          const theta = goldenAngle * i;
+
+          const px = Math.cos(theta) * r * radius;
+          const py = y * radius * 0.92;
+          const pz = Math.sin(theta) * r * radius;
+
+          const normal = new THREE.Vector3(px, py, pz).normalize();
+          const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+          const euler = new THREE.Euler().setFromQuaternion(quat);
+
+          let studColor = spec.petalColor;
+          if (i % 7 === 0 && spec.petalColor === 'PINK') studColor = 'LIGHT_PINK';
+
+          const floret = addBrickPart(flowerData, {
+            geo: GEOS.roundPlate1x1,
+            colorKey: studColor,
+            pos: [px, py, pz],
+            rot: [euler.x, euler.y, euler.z],
+            scale: [0.95, 1.0, 0.95],
+            studs: [[0, 0.14, 0]],
+            parentLocal: headPivot
+          });
+
+          flowerData.petals.push({ paired: floret, shed: false });
+        }
+
+        buildInnerConstructionGrid(flowerData, stemHeight + 0.14, 1.05, headContainer);
+
+      } else if (spec.archetype === 'daisy') {
+        addBrickPart(flowerData, {
+          geo: GEOS.round1x1,
+          colorKey: spec.stemColor,
+          pos: [0, -0.02, 0],
+          scale: [1.05, 0.9, 1.05],
+          parentLocal: headPivot
+        });
+
+        addBrickPart(flowerData, {
+          geo: GEOS.round1x1,
+          colorKey: spec.centerColor,
+          pos: [0, 0.08, 0],
+          scale: [1.15, 1.05, 1.15],
+          studs: [[0, 0.24, 0]],
+          parentLocal: headPivot
+        });
+
+        for (let i = 0; i < 5; i++) {
+          const a = (i / 5) * Math.PI * 2;
+          const pPivot = createPairedPivot(flowerData, [0, 0.05, 0], [0, a, 0], headPivot);
+
+          addBrickPart(flowerData, {
+            geo: GEOS.plate1x2,
+            colorKey: spec.petalColor,
+            pos: [0, 0.02, 0.44],
+            rot: [-0.14, 0, 0],
+            scale: [0.92, 0.95, 0.82],
+            studs: [[0, 0.18, 0.18], [0, 0.18, -0.18]],
+            parentLocal: pPivot
+          });
+
+          addBrickPart(flowerData, {
+            geo: GEOS.roundPlate1x1,
+            colorKey: spec.petalColor,
+            pos: [0, 0.08, 0.80],
+            rot: [-0.14, 0, 0],
+            scale: [1.02, 0.95, 1.02],
+            studs: [[0, 0.14, 0]],
+            parentLocal: pPivot
+          });
+
+          flowerData.petals.push({ paired: pPivot, shed: false });
+        }
+
+        buildInnerConstructionGrid(flowerData, stemHeight, 1.15, headContainer);
+
+      } else if (spec.archetype === 'tulip') {
+        addBrickPart(flowerData, {
+          geo: GEOS.round1x1,
+          colorKey: spec.stemColor,
+          pos: [0, 0.0, 0],
+          scale: [1.35, 1.1, 1.35],
+          parentLocal: headPivot
+        });
+
+        for (let i = 0; i < 4; i++) {
+          const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+          const pPivot = createPairedPivot(flowerData, [0, 0.12, 0], [0, a, 0], headPivot);
+
+          addBrickPart(flowerData, {
+            geo: GEOS.plate1x2,
+            colorKey: spec.petalColor,
+            pos: [0, 0.30, 0.23],
+            rot: [1.38, 0, 0],
+            scale: [1.1, 1.0, 0.95],
+            studs: [[0, 0.18, 0.18], [0, 0.18, -0.18]],
+            parentLocal: pPivot
+          });
+
+          flowerData.petals.push({ paired: pPivot, shed: false });
+        }
+
+        addBrickPart(flowerData, {
+          geo: GEOS.round1x1,
+          colorKey: spec.centerColor,
+          pos: [0, 0.30, 0],
+          scale: [0.95, 1.35, 0.95],
+          studs: [[0, 0.25, 0]],
+          parentLocal: headPivot
+        });
+
+        buildInnerConstructionGrid(flowerData, stemHeight + 0.24, 0.85, headContainer);
+      }
+    }
+
+    /**
+     * Sprouts a fresh secondary side-stem with a miniature bloom off an existing flower!
+     */
+    function sproutSecondaryStem(flowerData) {
+      if (flowerData.hasSideStem) return;
+      flowerData.hasSideStem = true;
+
+      const spec = SPECIES_MAP[flowerData.speciesId];
+      const attachY = Math.max(0.85, flowerData.baseStemHeight * 0.45);
+      const branchAngle = Math.random() * Math.PI * 2;
+
+      const branchPivot = createPairedPivot(
+        flowerData,
+        [0, attachY, 0],
+        [0.42, branchAngle, 0]
+      );
+      branchPivot.solid.scale.set(0.01, 0.01, 0.01);
+      branchPivot.xray.scale.set(0.01, 0.01, 0.01);
+
+      // 3-segment angled side stem
+      for (let i = 0; i < 3; i++) {
+        addBrickPart(flowerData, {
+          geo: GEOS.stemSeg,
+          colorKey: spec.stemColor,
+          pos: [0, 0.22 + i * 0.38, 0],
+          scale: [0.78, 0.88, 0.78],
+          parentLocal: branchPivot
+        });
+      }
+
+      // Fresh miniature bloom at the tip of the side-stem (seated flush)
+      const miniHead = createPairedPivot(flowerData, [0, 1.14, 0], [-0.35, 0, 0], branchPivot);
+      addBrickPart(flowerData, {
+        geo: GEOS.round1x1,
+        colorKey: spec.centerColor,
+        pos: [0, 0.06, 0],
+        scale: [0.82, 0.8, 0.82],
+        studs: [[0, 0.2, 0]],
+        parentLocal: miniHead
+      });
+
+      const miniPetalCount = 4;
+      for (let i = 0; i < miniPetalCount; i++) {
+        const a = (i / miniPetalCount) * Math.PI * 2;
+        const mp = createPairedPivot(flowerData, [0, 0.04, 0], [0, a, 0], miniHead);
+        addBrickPart(flowerData, {
+          geo: GEOS.roundPlate1x1,
+          colorKey: spec.petalColor,
+          pos: [0, 0.04, 0.34],
+          rot: [-0.25, 0, 0],
+          scale: [0.85, 0.85, 0.85],
+          studs: [[0, 0.14, 0]],
+          parentLocal: mp
+        });
+      }
+
+      flowerData.sideStemPivot = branchPivot;
+      flowerData.sideStemProgress = 0;
+    }
+
+    /**
+     * Detaches a single petal from a flower and lets it flutter gently to the baseplate
+     */
+    function shedOnePetal(flowerData) {
+      const remaining = flowerData.petals.filter((p) => !p.shed);
+      if (remaining.length === 0) return;
+
+      const pick = remaining[Math.floor(Math.random() * remaining.length)];
+      pick.shed = true;
+
+      // Capture world transform before detaching
+      const solidObj = pick.paired.solid;
+      solidObj.updateWorldMatrix(true, false);
+      const worldPos = new THREE.Vector3();
+      const worldQuat = new THREE.Quaternion();
+      const worldScale = new THREE.Vector3();
+      solidObj.matrixWorld.decompose(worldPos, worldQuat, worldScale);
+
+      // Hide from X-ray group and move solid petal into fallenGroup
+      pick.paired.xray.visible = false;
+      solidObj.parent.remove(solidObj);
+
+      solidObj.position.copy(worldPos);
+      solidObj.quaternion.copy(worldQuat);
+      solidObj.scale.copy(worldScale);
+      fallenGroup.add(solidObj);
+
+      // Register gentle falling physics
+      fallingPetals.push({
+        mesh: solidObj,
+        vel: new THREE.Vector3(
+          (Math.random() - 0.5) * 0.55,
+          -0.25 - Math.random() * 0.25,
+          (Math.random() - 0.5) * 0.55
+        ),
+        rotVel: new THREE.Vector3(
+          (Math.random() - 0.5) * 2.2,
+          (Math.random() - 0.5) * 1.8,
+          (Math.random() - 0.5) * 2.2
+        ),
+        flutterPhase: Math.random() * Math.PI * 2,
+        settled: false
+      });
+
+      // Keep fallen petal pile reasonable
+      if (fallingPetals.length > 65) {
+        const oldest = fallingPetals.shift();
+        fallenGroup.remove(oldest.mesh);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // 8. STUDDED BASEPLATE ISLAND
+    // ---------------------------------------------------------------------------
+    function buildBaseplate() {
+      baseplateGroup = new THREE.Group();
+
+      const mainPlate = new THREE.Mesh(
+        new THREE.CylinderGeometry(7.2, 7.45, 0.42, 48),
+        MATERIALS.BASEPLATE
+      );
+      mainPlate.position.y = -0.21;
+      mainPlate.receiveShadow = true;
+      baseplateGroup.add(mainPlate);
+
+      const rimPlate = new THREE.Mesh(
+        new THREE.CylinderGeometry(7.55, 7.65, 0.22, 48),
+        MATERIALS.BASE_TRIM
+      );
+      rimPlate.position.y = -0.32;
+      rimPlate.receiveShadow = true;
+      baseplateGroup.add(rimPlate);
+
+      const U = 0.65;
+      const studPositions = [];
+      for (let x = -6.5; x <= 6.5; x += U) {
+        for (let z = -6.5; z <= 6.5; z += U) {
+          if (Math.hypot(x, z) <= 6.6) {
+            studPositions.push([x, 0.04, z]);
+          }
+        }
+      }
+
+      const instancedStuds = new THREE.InstancedMesh(
+        new THREE.CylinderGeometry(0.16, 0.16, 0.09, 10),
+        MATERIALS.BASEPLATE,
+        studPositions.length
+      );
+      instancedStuds.receiveShadow = true;
+
+      const dummy = new THREE.Object3D();
+      studPositions.forEach(([x, y, z], idx) => {
+        dummy.position.set(x, y, z);
+        dummy.updateMatrix();
+        instancedStuds.setMatrixAt(idx, dummy.matrix);
+      });
+      instancedStuds.instanceMatrix.needsUpdate = true;
+      baseplateGroup.add(instancedStuds);
+
+      const scatterColors = ['GREEN', 'TEAL', 'PINK', 'YELLOW', 'ORANGE'];
+      for (let i = 0; i < 16; i++) {
+        const angle = (i / 16) * Math.PI * 2 + Math.random() * 0.4;
+        const dist = 2.4 + Math.random() * 4.0;
+        const tile = new THREE.Mesh(
+          GEOS.tileRoundSmall,
+          MATERIALS[scatterColors[i % scatterColors.length]]
+        );
+        tile.position.set(Math.cos(angle) * dist, 0.05, Math.sin(angle) * dist);
+        tile.receiveShadow = true;
+        tile.castShadow = true;
+        baseplateGroup.add(tile);
+      }
+
+      scene.add(baseplateGroup);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 9. GARDEN SPAWNING & LIVING LIFECYCLE
+    // ---------------------------------------------------------------------------
+    function findOpenGardenSpot() {
+      let bestX = 0, bestZ = 0;
+      for (let attempt = 0; attempt < 40; attempt++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 1.0 + Math.random() * 4.9;
+        const cx = Math.cos(angle) * dist;
+        const cz = Math.sin(angle) * dist;
+        const tooClose = flowers.some((f) => Math.hypot(f.root.position.x - cx, f.root.position.z - cz) < 1.35);
+        if (!tooClose) {
+          bestX = cx;
+          bestZ = cz;
+          break;
+        }
+      }
+      return { x: bestX, z: bestZ };
+    }
+
+    /**
+     * Spawns a flower immediately in full bloom (no drop-in construction)
+     * with its own organic timers for growing taller, shedding petals, and sprouting a side-stem.
+     */
+    function spawnFlower(speciesId, x, z, height) {
+      const spec = SPECIES_MAP[speciesId];
+      if (!spec) return null;
+
+      const id = flowerIdCounter++;
+      const root = new THREE.Group();
+      root.position.set(x, 0, z);
+
+      const solidGroup = new THREE.Group();
+      const xrayGroup = new THREE.Group();
+      xrayGroup.visible = false;
+
+      root.add(solidGroup, xrayGroup);
+      gardenGroup.add(root);
+
+      const flowerData = {
+        id,
+        speciesId,
+        root,
+        solidGroup,
+        xrayGroup,
+        petals: [],
+        headContainer: null,
+        baseStemHeight: 0,
+        currentStemSegs: height,
+        // Growth over time state
+        canGrowTaller: Math.random() < 0.72,
+        extraHeightGrown: 0,
+        maxExtraHeight: 0.9 + Math.random() * 1.4,
+        growthRate: 0.018 + Math.random() * 0.022, // Smooth slow vertical elongation
+        nextStemSegThreshold: SEG_H,
+        // Petal shedding over time state (all flowers eventually lose petals over a long time)
+        nextPetalDropTime: elapsedTime + 14 + Math.random() * 24,
+        petalDropInterval: 10 + Math.random() * 14,
+        // Secondary stem sprout state
+        hasSideStem: false,
+        sideStemPivot: null,
+        sideStemProgress: 0,
+        sideStemTriggerTime: elapsedTime + 26 + Math.random() * 28,
+        // Gentle breeze sway
+        swayPhase: Math.random() * Math.PI * 2,
+        swaySpeed: 0.85 + Math.random() * 0.5,
+        // X-Ray Flicker State
+        xrayActive: false,
+        xrayStartTime: 0,
+        xrayDuration: 1.9
+      };
+
+      buildFlowerGeometry(flowerData, spec, height, false);
+      flowers.push(flowerData);
+      return flowerData;
+    }
+
+    function buildInitialGarden() {
+      flowers.forEach((f) => gardenGroup.remove(f.root));
+      flowers = [];
+      fallingPetals.forEach((p) => fallenGroup.remove(p.mesh));
+      fallingPetals = [];
+      xrayState.activeFlower = null;
+
+      const curatedPositions = [
+        { x:  0.0, z:  0.2, height: 8 },
+        { x: -2.1, z: -1.4, height: 7 },
+        { x:  2.2, z: -0.9, height: 7 },
+        { x: -1.7, z:  1.9, height: 6 },
+        { x:  1.6, z:  2.1, height: 6 },
+        { x: -0.3, z: -3.2, height: 8 },
+        { x: -3.7, z:  0.6, height: 5 },
+        { x:  3.6, z:  1.2, height: 6 },
+        { x: -3.4, z: -2.9, height: 5 },
+        { x:  3.4, z: -3.1, height: 7 },
+        { x:  0.2, z:  3.9, height: 5 },
+        { x: -2.8, z:  3.6, height: 6 },
+        { x:  4.2, z: -0.6, height: 5 },
+        { x:  2.5, z:  3.8, height: 4 }
+      ];
+
+      const activeIds = Array.from(selectedSpecies);
+      if (activeIds.length === 0) return;
+
+      curatedPositions.forEach((pos, idx) => {
+        const spId = activeIds[idx % activeIds.length];
+        spawnFlower(spId, pos.x, pos.z, pos.height);
+      });
+
+      xrayState.nextTriggerTime = elapsedTime + 9.0 + Math.random() * 6.0;
+    }
+
+    function toggleSpeciesInGarden(speciesId) {
+      const spec = SPECIES_MAP[speciesId];
+      if (!spec) return;
+
+      if (selectedSpecies.has(speciesId)) {
+        if (selectedSpecies.size <= 1) {
+          showToast('Keep at least one specimen in the garden.');
+          return;
+        }
+        selectedSpecies.delete(speciesId);
+        // Remove instances of this species from 3D garden
+        flowers = flowers.filter((f) => {
+          if (f.speciesId === speciesId) {
+            gardenGroup.remove(f.root);
+            if (xrayState.activeFlower === f) xrayState.activeFlower = null;
+            return false;
+          }
+          return true;
+        });
+        showToast(`Removed ${spec.latin} from garden`);
+      } else {
+        selectedSpecies.add(speciesId);
+        const spot = findOpenGardenSpot();
+        const height = 5 + Math.floor(Math.random() * 4);
+        spawnFlower(speciesId, spot.x, spot.z, height);
+        showToast(`Added ${spec.latin} to garden`);
+      }
+
+      updateBotanyWallSelectionUI();
+      if (activePlateSpeciesId === speciesId) {
+        updatePlateToggleButton(speciesId);
+      }
+    }
+
+    function triggerFlowerXray(flower, withSound = false) {
+      if (!flower) return;
+
+      if (xrayState.activeFlower && xrayState.activeFlower !== flower) {
+        xrayState.activeFlower.xrayActive = false;
+        xrayState.activeFlower.solidGroup.visible = true;
+        xrayState.activeFlower.xrayGroup.visible = false;
+      }
+
+      flower.xrayActive = true;
+      flower.xrayStartTime = elapsedTime;
+      flower.xrayDuration = 1.65 + Math.random() * 0.65;
+      xrayState.activeFlower = flower;
+
+      if (withSound) {
+        playFlowerChime(flower.speciesId);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // 10. ANIMATION LOOP (Growth, Shedding, Side-Stems, Rare X-Ray, Camera)
+    // ---------------------------------------------------------------------------
+    function updateGarden(dt) {
+      elapsedTime += dt;
+
+      for (let i = 0; i < flowers.length; i++) {
+        const f = flowers[i];
+        const spec = SPECIES_MAP[f.speciesId];
+
+        // --- A. Gradual Stem Growth Over Time ---
+        if (f.canGrowTaller && f.extraHeightGrown < f.maxExtraHeight) {
+          const deltaH = f.growthRate * dt;
+          f.extraHeightGrown += deltaH;
+          if (f.headContainer) {
+            f.headContainer.solid.position.y = f.baseStemHeight + f.extraHeightGrown;
+            f.headContainer.xray.position.y = f.baseStemHeight + f.extraHeightGrown;
+          }
+          // Insert a new physical stem brick as height crosses each segment step
+          if (f.extraHeightGrown >= f.nextStemSegThreshold) {
+            const newY = 0.28 + f.currentStemSegs * SEG_H;
+            addBrickPart(f, {
+              geo: GEOS.stemSeg,
+              colorKey: spec.stemColor,
+              pos: [0, newY, 0]
+            });
+            f.currentStemSegs++;
+            f.nextStemSegThreshold += SEG_H;
+          }
+        }
+
+        // --- B. Eventual Petal Shedding Over Time ---
+        if (elapsedTime >= f.nextPetalDropTime) {
+          shedOnePetal(f);
+          f.nextPetalDropTime = elapsedTime + f.petalDropInterval + Math.random() * 8;
+        }
+
+        // --- C. Secondary Stem Sprouting Over Time ---
+        if (!f.hasSideStem && elapsedTime >= f.sideStemTriggerTime) {
+          sproutSecondaryStem(f);
+        }
+        if (f.hasSideStem && f.sideStemPivot && f.sideStemProgress < 1) {
+          f.sideStemProgress = Math.min(1, f.sideStemProgress + dt * 0.22);
+          const s = 0.01 + 0.99 * (1 - Math.pow(1 - f.sideStemProgress, 3));
+          f.sideStemPivot.solid.scale.set(s, s, s);
+          f.sideStemPivot.xray.scale.set(s, s, s);
+        }
+
+        // --- D. Gentle Botanical Breeze Sway ---
+        const sway = Math.sin(elapsedTime * f.swaySpeed + f.swayPhase) * 0.026;
+        const swayZ = Math.cos(elapsedTime * f.swaySpeed * 0.8 + f.swayPhase) * 0.02;
+        f.root.rotation.x = sway;
+        f.root.rotation.z = swayZ;
+
+        // --- E. X-Ray Inner Grid Flicker ---
+        if (f.xrayActive) {
+          const age = elapsedTime - f.xrayStartTime;
+          const norm = age / f.xrayDuration;
+
+          if (norm >= 1) {
+            f.xrayActive = false;
+            f.solidGroup.visible = true;
+            f.xrayGroup.visible = false;
+            if (xrayState.activeFlower === f) xrayState.activeFlower = null;
+          } else {
+            let showXray = true;
+            if (norm < 0.22) {
+              showXray = Math.sin(age * 68) > -0.15;
+              if (Math.random() < 0.08) playSubtleStaticTick();
+            } else if (norm > 0.78) {
+              showXray = Math.sin(age * 74) > 0.1;
+            } else {
+              showXray = Math.sin(age * 42) > -0.82;
+            }
+
+            f.solidGroup.visible = !showXray;
+            f.xrayGroup.visible = showXray;
+            MATERIALS.XRAY_GRID.opacity = 0.52 + Math.sin(age * 30) * 0.22;
+          }
+        }
+      }
+
+      // --- F. Falling Petals Gentle Flutter Physics ---
+      for (let i = 0; i < fallingPetals.length; i++) {
+        const p = fallingPetals[i];
+        if (p.settled) continue;
+
+        p.vel.y = Math.max(-1.1, p.vel.y - 0.65 * dt);
+        p.mesh.position.x += (p.vel.x + Math.sin(elapsedTime * 3.2 + p.flutterPhase) * 0.28) * dt;
+        p.mesh.position.y += p.vel.y * dt;
+        p.mesh.position.z += (p.vel.z + Math.cos(elapsedTime * 2.7 + p.flutterPhase) * 0.28) * dt;
+
+        p.mesh.rotation.x += p.rotVel.x * dt;
+        p.mesh.rotation.y += p.rotVel.y * dt;
+        p.mesh.rotation.z += p.rotVel.z * dt;
+
+        if (p.mesh.position.y <= 0.12) {
+          p.mesh.position.y = 0.12;
+          p.settled = true;
+          playPetalLandSound();
+        }
+      }
+
+      // --- G. Rare Autonomous X-Ray Scheduler (Every ~10–18s) ---
+      if (elapsedTime >= xrayState.nextTriggerTime && !xrayState.activeFlower && flowers.length > 0) {
+        const chosen = flowers[Math.floor(Math.random() * flowers.length)];
+        triggerFlowerXray(chosen, false);
+        xrayState.nextTriggerTime = elapsedTime + 10.5 + Math.random() * 8.0;
+      }
+
+      // --- H. Smooth Camera Orbit ---
+      if (camState.autoRotate && !camState.isDragging && (elapsedTime - camState.lastInteractionTime > 4.0)) {
+        camState.targetTheta += dt * 0.08;
+      }
+
+      camState.theta += (camState.targetTheta - camState.theta) * Math.min(1, dt * 6.5);
+      camState.phi += (camState.targetPhi - camState.phi) * Math.min(1, dt * 6.5);
+      camState.radius += (camState.targetRadius - camState.radius) * Math.min(1, dt * 6.5);
+
+      camera.position.x = camState.targetLookAt.x + camState.radius * Math.sin(camState.phi) * Math.sin(camState.theta);
+      camera.position.y = camState.targetLookAt.y + camState.radius * Math.cos(camState.phi);
+      camera.position.z = camState.targetLookAt.z + camState.radius * Math.sin(camState.phi) * Math.cos(camState.theta);
+      camera.lookAt(camState.targetLookAt);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      updateGarden(dt);
+      renderer.render(scene, camera);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 11. OFFSCREEN BOTANICAL PLATE SNAPSHOT ENGINE (For Wall & Study Sheet)
+    // ---------------------------------------------------------------------------
+    function getSnapshotRenderer() {
+      if (!snapshotRenderer) {
+        snapshotRenderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: true,
+          preserveDrawingBuffer: true
+        });
+        snapshotRenderer.setPixelRatio(2);
+        snapshotRenderer.outputEncoding = THREE.sRGBEncoding;
+        snapshotRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+        snapshotRenderer.toneMappingExposure = 1.05;
+      }
+      return snapshotRenderer;
+    }
+
+    function createStudioSnapshotScene() {
+      const s = new THREE.Scene();
+      s.add(new THREE.HemisphereLight(0xFFFDF8, 0xEAD6C2, 0.96));
+      const key = new THREE.DirectionalLight(0xFFF8EE, 0.85);
+      key.position.set(6, 12, 9);
+      s.add(key);
+      const rim = new THREE.DirectionalLight(0xD5EEF5, 0.38);
+      rim.position.set(-8, 6, -7);
+      s.add(rim);
+      return s;
+    }
+
+    /**
+     * Renders both the Solid & X-Ray Inner Grid botanical portrait of a species
+     * using one shared offscreen WebGLRenderer so the Botany Wall is crisp & fast.
+     */
+    function getSpeciesSnapshots(speciesId) {
+      if (snapshotCache.has(speciesId)) return snapshotCache.get(speciesId);
+
+      const spec = SPECIES_MAP[speciesId];
+      const r = getSnapshotRenderer();
+      const width = 340, height = 420;
+      r.setSize(width, height, false);
+
+      const s = createStudioSnapshotScene();
+      const cam = new THREE.PerspectiveCamera(34, width / height, 0.1, 60);
+
+      const root = new THREE.Group();
+      const solidGroup = new THREE.Group();
+      const xrayGroup = new THREE.Group();
+      xrayGroup.visible = false;
+      root.add(solidGroup, xrayGroup);
+      s.add(root);
+
+      const tempData = {
+        id: 0,
+        root,
+        solidGroup,
+        xrayGroup,
+        petals: []
+      };
+
+      const stemSegs = 6;
+      buildFlowerGeometry(tempData, spec, stemSegs, true);
+
+      // Frame the whole specimen neatly like a vintage botanical plate
+      cam.position.set(0.35, 2.75, 7.6);
+      cam.lookAt(0, 2.15, 0);
+
+      r.setClearColor(0x000000, 0);
+      r.render(s, cam);
+      const solidUrl = r.domElement.toDataURL('image/png');
+
+      // Render X-Ray inner-grid portrait
+      solidGroup.visible = false;
+      xrayGroup.visible = true;
+      MATERIALS.XRAY_GRID.opacity = 0.72;
+      r.render(s, cam);
+      const xrayUrl = r.domElement.toDataURL('image/png');
+
+      const result = { solidUrl, xrayUrl };
+      snapshotCache.set(speciesId, result);
+      return result;
+    }
+
+    /**
+     * Renders the 5 Dissected Botanical Anatomy Studies (Stamen, Corolla, Calyx,
+     * Folium, Semen) for the Dedicated Copperplate Page!
+     */
+    function getSpeciesDissections(speciesId) {
+      if (plateDissectionCache.has(speciesId)) return plateDissectionCache.get(speciesId);
+
+      const spec = SPECIES_MAP[speciesId];
+      const r = getSnapshotRenderer();
+      const size = 240;
+      r.setSize(size, size, false);
+      r.setClearColor(0x000000, 0);
+
+      const renderPart = (buildFn, camPos, lookAtY = 0.2) => {
+        const s = createStudioSnapshotScene();
+        const cam = new THREE.PerspectiveCamera(34, 1, 0.1, 40);
+        const grp = new THREE.Group();
+        const dummyData = { id: 0, solidGroup: grp, xrayGroup: new THREE.Group(), petals: [] };
+        buildFn(dummyData);
+        s.add(grp);
+        cam.position.set(camPos[0], camPos[1], camPos[2]);
+        cam.lookAt(0, lookAtY, 0);
+        r.render(s, cam);
+        return r.domElement.toDataURL('image/png');
+      };
+
+      // 1. Stamen Study
+      const stamenUrl = renderPart((d) => {
+        addBrickPart(d, { geo: GEOS.stamenPin, colorKey: spec.centerColor, pos: [0, 0.15, 0], scale: [1.3, 1.5, 1.3], rot: [0, 0, -0.16] });
+        addBrickPart(d, { geo: GEOS.stamenTip, colorKey: spec.petalColor, pos: [0.08, 0.45, 0], scale: [1.5, 1.8, 1.5] });
+      }, [0.4, 0.45, 1.75], 0.25);
+
+      // 2. Corolla (Isolated Bloom Crown)
+      const corollaUrl = renderPart((d) => {
+        addBrickPart(d, { geo: GEOS.round1x1, colorKey: spec.centerColor, pos: [0, 0.1, 0], scale: [1.1, 1.0, 1.1], studs: [[0, 0.24, 0]] });
+        const n = spec.archetype === 'tulip' ? 4 : 5;
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * Math.PI * 2;
+          const p = createPairedPivot(d, [0, 0.08, 0], [0, a, 0]);
+          addBrickPart(d, {
+            geo: GEOS.plate1x2,
+            colorKey: spec.petalColor,
+            pos: [0, 0.14, 0.42],
+            rot: [spec.archetype === 'tulip' ? 1.15 : -0.35, 0, 0],
+            scale: [1.0, 0.95, 0.85],
+            studs: [[0, 0.18, 0.16], [0, 0.18, -0.16]],
+            parentLocal: p
+          });
+        }
+      }, [0.2, 1.75, 2.55], 0.15);
+
+      // 3. Calyx Study
+      const calyxUrl = renderPart((d) => {
+        addBrickPart(d, { geo: GEOS.stemSeg, colorKey: spec.stemColor, pos: [0, -0.15, 0] });
+        addBrickPart(d, { geo: GEOS.round1x1, colorKey: spec.stemColor, pos: [0, 0.2, 0], scale: [1.35, 1.1, 1.35], studs: [[0, 0.25, 0]] });
+      }, [0.4, 0.85, 1.9], 0.05);
+
+      // 4. Folium (Leaf Plate)
+      const leafUrl = renderPart((d) => {
+        addBrickPart(d, {
+          geo: GEOS.plate1x2,
+          colorKey: spec.leafColor,
+          pos: [0, 0.1, 0],
+          rot: [0.35, 0.4, 0.2],
+          scale: [0.95, 0.9, 1.15],
+          studs: [[0, 0.18, 0.2], [0, 0.18, -0.2]]
+        });
+        addBrickPart(d, {
+          geo: GEOS.roundPlate1x1,
+          colorKey: spec.leafColor,
+          pos: [0.18, 0.22, 0.44],
+          rot: [0.35, 0.4, 0.2],
+          scale: [0.85, 0.9, 0.85],
+          studs: [[0, 0.14, 0]]
+        });
+      }, [0.5, 1.2, 2.05], 0.15);
+
+      // 5. Semen (Single Seed Stud)
+      const seedUrl = renderPart((d) => {
+        addBrickPart(d, {
+          geo: GEOS.roundPlate1x1,
+          colorKey: spec.petalColor,
+          pos: [0, 0.08, 0],
+          scale: [1.1, 1.1, 1.1],
+          studs: [[0, 0.14, 0]]
+        });
+      }, [0.35, 0.72, 1.45], 0.12);
+
+      const res = { stamenUrl, corollaUrl, calyxUrl, leafUrl, seedUrl };
+      plateDissectionCache.set(speciesId, res);
+      return res;
+    }
+
+    // ---------------------------------------------------------------------------
+    // 12. BOTANY WALL & DEDICATED PLATE UI BUILDERS
+    // ---------------------------------------------------------------------------
+    function triggerElementXrayStatic(el, speciesId) {
+      playFlowerChime(speciesId);
+      el.classList.remove('xray-static-active');
+      void el.offsetWidth; // Reflow to restart flicker animation
+      el.classList.add('xray-static-active');
+      clearTimeout(el._xrayTimer);
+      el._xrayTimer = setTimeout(() => {
+        el.classList.remove('xray-static-active');
+      }, 1400);
+    }
+
+    function buildBotanyWall() {
+      const container = document.getElementById('botany-masonry');
+      container.innerHTML = '';
+
+      SPECIES_CATALOG.forEach((spec) => {
+        const snaps = getSpeciesSnapshots(spec.id);
+        const isSelected = selectedSpecies.has(spec.id);
+
+        const card = document.createElement('article');
+        card.className = 'masonry-item archival-paper plate-frame rounded-sm p-4 flex flex-col transition-all duration-200 hover:shadow-lg';
+        card.dataset.speciesId = spec.id;
+
+        card.innerHTML = `
+          <!-- Plate Top Metadata -->
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] uppercase tracking-widest font-medium text-[#5C4E3E]/65">
+              ${spec.archetype}
+            </span>
+            <span class="font-script-plate text-xl text-[#3A3026]/85 leading-none">
+              ${spec.tab}
+            </span>
+          </div>
+
+          <!-- Clickable Botanical Specimen Artwork (Sound + Static X-Ray on Click) -->
+          <div class="wall-art-trigger relative w-full ${spec.aspectClass} flex items-center justify-center cursor-pointer group overflow-hidden my-1"
+               title="Click to chime & view inner grid">
+            <img src="${snaps.solidUrl}" alt="${spec.latin}"
+                 class="img-solid w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.03]" />
+            <img src="${snaps.xrayUrl}" alt="${spec.latin} Inner Grid"
+                 class="img-xray absolute inset-0 w-full h-full object-contain opacity-0 pointer-events-none" />
+            <div class="static-scanlines absolute inset-0"></div>
+          </div>
+
+          <!-- Vintage Latin & Script Title -->
+          <div class="text-center pt-2 border-t border-[#4A3F32]/12">
+            <h3 class="font-serif-plate text-lg font-medium text-[#241D16] leading-tight">
+              ${spec.latin}
+            </h3>
+            <p class="font-script-plate text-2xl text-[#3A3026]/85 leading-tight -mt-0.5">
+              ${spec.script}
+            </p>
+          </div>
+
+          <!-- Card Actions: Select/Add to Garden + Info Button -->
+          <div class="mt-3 pt-2.5 border-t border-[#4A3F32]/10 flex items-center justify-between gap-2">
+            <button type="button"
+              class="wall-select-btn flex-1 rounded-full py-1.5 px-3 text-xs font-medium border transition-colors flex items-center justify-center gap-1.5"
+              data-species="${spec.id}">
+            </button>
+
+            <button type="button"
+              class="wall-info-btn w-8 h-8 rounded-full border border-[#4A3F32]/20 bg-[#EFE7D8]/70 hover:bg-[#1D637A] hover:text-[#FDF0E7] hover:border-[#1D637A] text-[#3A3026] flex items-center justify-center transition-colors shrink-0"
+              data-species="${spec.id}"
+              title="Open Botanical Study Plate"
+              aria-label="Open Botanical Study Plate for ${spec.latin}">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          </div>
+        `;
+
+        // Click specimen image -> Beautiful chime + X-ray static flicker
+        const artEl = card.querySelector('.wall-art-trigger');
+        artEl.addEventListener('click', () => {
+          triggerElementXrayStatic(artEl, spec.id);
+        });
+
+        // Toggle species in garden
+        const selectBtn = card.querySelector('.wall-select-btn');
+        selectBtn.addEventListener('click', () => {
+          toggleSpeciesInGarden(spec.id);
+        });
+
+        // Open dedicated botanical study plate page
+        const infoBtn = card.querySelector('.wall-info-btn');
+        infoBtn.addEventListener('click', () => {
+          openDedicatedPlate(spec.id);
+        });
+
+        container.appendChild(card);
+      });
+
+      wallBuilt = true;
+      updateBotanyWallSelectionUI();
+    }
+
+    function updateBotanyWallSelectionUI() {
+      document.getElementById('wall-selection-count').textContent = `${selectedSpecies.size} in Garden`;
+
+      document.querySelectorAll('.wall-select-btn').forEach((btn) => {
+        const id = btn.dataset.species;
+        const active = selectedSpecies.has(id);
+        if (active) {
+          btn.className = 'wall-select-btn flex-1 rounded-full py-1.5 px-3 text-xs font-medium border transition-colors flex items-center justify-center gap-1.5 bg-[#1D637A] text-[#FDF0E7] border-[#1D637A] hover:bg-[#175063]';
+          btn.innerHTML = `
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>In Garden</span>
+          `;
+        } else {
+          btn.className = 'wall-select-btn flex-1 rounded-full py-1.5 px-3 text-xs font-medium border transition-colors flex items-center justify-center gap-1.5 bg-transparent text-[#3A3026] border-[#4A3F32]/25 hover:bg-[#EFE7D8]';
+          btn.innerHTML = `
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add to Garden</span>
+          `;
+        }
+      });
+    }
+
+    function updatePlateToggleButton(speciesId) {
+      const btn = document.getElementById('btn-plate-toggle-garden');
+      const active = selectedSpecies.has(speciesId);
+      if (active) {
+        btn.className = 'garden-btn rounded-full px-3.5 py-1.5 text-xs font-medium border bg-[#1D637A] text-[#FDF0E7] border-[#1D637A]';
+        btn.textContent = '✓ In Garden';
+      } else {
+        btn.className = 'garden-btn rounded-full px-3.5 py-1.5 text-xs font-medium border bg-[#EFE7D8] text-[#2C241B] border-[#4A3F32]/20';
+        btn.textContent = '+ Add to Garden';
+      }
+    }
+
+    function openDedicatedPlate(speciesId) {
+      const spec = SPECIES_MAP[speciesId];
+      if (!spec) return;
+      activePlateSpeciesId = speciesId;
+
+      const snaps = getSpeciesSnapshots(speciesId);
+      const parts = getSpeciesDissections(speciesId);
+
+      document.getElementById('plate-tab-number').textContent = spec.tab;
+      document.getElementById('plate-hero-solid').src = snaps.solidUrl;
+      document.getElementById('plate-hero-xray').src = snaps.xrayUrl;
+      document.getElementById('plate-part-stamen').src = parts.stamenUrl;
+      document.getElementById('plate-part-corolla').src = parts.corollaUrl;
+      document.getElementById('plate-part-calyx').src = parts.calyxUrl;
+      document.getElementById('plate-part-leaf').src = parts.leafUrl;
+      document.getElementById('plate-part-seed').src = parts.seedUrl;
+      document.getElementById('plate-notes').textContent = spec.notes;
+      document.getElementById('plate-latin-name').textContent = spec.latin;
+      document.getElementById('plate-script-name').textContent = spec.script;
+
+      updatePlateToggleButton(speciesId);
+
+      const modal = document.getElementById('specimen-plate-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function openBotanyWall() {
+      if (!wallBuilt) {
+        buildBotanyWall();
+      } else {
+        updateBotanyWallSelectionUI();
+      }
+      const wall = document.getElementById('botany-wall');
+      wall.classList.remove('hidden');
+      wall.classList.add('flex');
+      document.getElementById('garden-header').classList.add('opacity-0', 'pointer-events-none');
+      document.getElementById('garden-controls').classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function closeBotanyWall() {
+      const wall = document.getElementById('botany-wall');
+      wall.classList.add('hidden');
+      wall.classList.remove('flex');
+      document.getElementById('garden-header').classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('garden-controls').classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    // ---------------------------------------------------------------------------
+    // 13. 3D INTERACTIONS (Orbit, Zoom, Click Flower -> Beautiful Chime + X-Ray)
+    // ---------------------------------------------------------------------------
+    function setupInteractions(domElement) {
+      const clampPhi = (v) => Math.max(0.32, Math.min(1.42, v));
+      const clampRadius = (v) => Math.max(9.5, Math.min(30, v));
+
+      domElement.addEventListener('mousedown', (e) => {
+        camState.isDragging = true;
+        camState.lastX = e.clientX;
+        camState.lastY = e.clientY;
+        camState.pointerDownX = e.clientX;
+        camState.pointerDownY = e.clientY;
+        camState.lastInteractionTime = elapsedTime;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!camState.isDragging) return;
+        const dx = e.clientX - camState.lastX;
+        const dy = e.clientY - camState.lastY;
+        camState.lastX = e.clientX;
+        camState.lastY = e.clientY;
+
+        camState.targetTheta -= dx * 0.0075;
+        camState.targetPhi = clampPhi(camState.targetPhi - dy * 0.0065);
+        camState.lastInteractionTime = elapsedTime;
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        if (!camState.isDragging) return;
+        camState.isDragging = false;
+        if (Math.hypot(e.clientX - camState.pointerDownX, e.clientY - camState.pointerDownY) < 6) {
+          handleTapFlower(e.clientX, e.clientY);
+        }
+      });
+
+      domElement.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        camState.targetRadius = clampRadius(camState.targetRadius + e.deltaY * 0.012);
+        camState.lastInteractionTime = elapsedTime;
+      }, { passive: false });
+
+      domElement.addEventListener('touchstart', (e) => {
+        camState.lastInteractionTime = elapsedTime;
+        if (e.touches.length === 1) {
+          camState.isDragging = true;
+          camState.lastX = e.touches[0].clientX;
+          camState.lastY = e.touches[0].clientY;
+          camState.pointerDownX = e.touches[0].clientX;
+          camState.pointerDownY = e.touches[0].clientY;
+        } else if (e.touches.length === 2) {
+          camState.isDragging = false;
+          camState.pinchStartDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          camState.pinchStartRadius = camState.targetRadius;
+        }
+      }, { passive: true });
+
+      domElement.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1 && camState.isDragging) {
+          const dx = e.touches[0].clientX - camState.lastX;
+          const dy = e.touches[0].clientY - camState.lastY;
+          camState.lastX = e.touches[0].clientX;
+          camState.lastY = e.touches[0].clientY;
+          camState.targetTheta -= dx * 0.0085;
+          camState.targetPhi = clampPhi(camState.targetPhi - dy * 0.0075);
+          camState.lastInteractionTime = elapsedTime;
+        } else if (e.touches.length === 2) {
+          const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          if (camState.pinchStartDist > 0) {
+            const scale = camState.pinchStartDist / dist;
+            camState.targetRadius = clampRadius(camState.pinchStartRadius * scale);
+          }
+        }
+      }, { passive: true });
+
+      domElement.addEventListener('touchend', (e) => {
+        if (e.changedTouches.length === 1 && camState.isDragging) {
+          const t = e.changedTouches[0];
+          if (Math.hypot(t.clientX - camState.pointerDownX, t.clientY - camState.pointerDownY) < 10) {
+            handleTapFlower(t.clientX, t.clientY);
+          }
+        }
+        if (e.touches.length === 0) {
+          camState.isDragging = false;
+        }
+      }, { passive: true });
+    }
+
+    function handleTapFlower(clientX, clientY) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((clientX - rect.left) / rect.width) * 2 - 1,
+        -((clientY - rect.top) / rect.height) * 2 + 1
+      );
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(gardenGroup.children, true);
+      for (let i = 0; i < hits.length; i++) {
+        const fid = hits[i].object.userData.flowerId;
+        if (fid) {
+          const found = flowers.find((f) => f.id === fid);
+          if (found) {
+            triggerFlowerXray(found, true);
+            return;
+          }
+        }
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // 14. UI CONTROLS & TOAST
+    // ---------------------------------------------------------------------------
+    let toastTimer = null;
+    function showToast(text) {
+      const el = document.getElementById('toast-msg');
+      el.firstElementChild.textContent = text;
+      el.classList.remove('opacity-0', 'translate-y-2');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+      }, 2200);
+    }
+
+    function setupUI() {
+      document.getElementById('btn-botany-wall').addEventListener('click', openBotanyWall);
+      document.getElementById('btn-close-wall').addEventListener('click', closeBotanyWall);
+
+      document.getElementById('btn-plant').addEventListener('click', () => {
+        if (flowers.length >= 26) {
+          showToast('Garden is in full bloom! Click Refresh to replant.');
+          return;
+        }
+        const pool = Array.from(selectedSpecies);
+        const pickId = pool[Math.floor(Math.random() * pool.length)];
+        const spot = findOpenGardenSpot();
+        const height = 4 + Math.floor(Math.random() * 5);
+        const f = spawnFlower(pickId, spot.x, spot.z, height);
+        if (f) {
+          playFlowerChime(pickId);
+          showToast(`Planted ${SPECIES_MAP[pickId].latin}`);
+        }
+      });
+
+      document.getElementById('btn-refresh').addEventListener('click', () => {
+        buildInitialGarden();
+        showToast('Garden refreshed with fresh blooms');
+      });
+
+      document.getElementById('btn-sound').addEventListener('click', async () => {
+        soundEnabled = !soundEnabled;
+        document.getElementById('icon-sound-on').classList.toggle('hidden', !soundEnabled);
+        document.getElementById('icon-sound-off').classList.toggle('hidden', soundEnabled);
+        if (soundEnabled) {
+          await ensureAudioStarted();
+          playFlowerChime('hibiscus_orange');
+          showToast('Harmonic chimes enabled');
+        } else {
+          showToast('Sound muted');
+        }
+      });
+
+      // Dedicated Study Plate Controls
+      const plateModal = document.getElementById('specimen-plate-modal');
+      document.getElementById('btn-close-plate').addEventListener('click', () => {
+        plateModal.classList.add('hidden');
+        plateModal.classList.remove('flex');
+      });
+
+      plateModal.addEventListener('click', (e) => {
+        if (e.target === plateModal) {
+          plateModal.classList.add('hidden');
+          plateModal.classList.remove('flex');
+        }
+      });
+
+      document.getElementById('btn-plate-toggle-garden').addEventListener('click', () => {
+        if (activePlateSpeciesId) {
+          toggleSpeciesInGarden(activePlateSpeciesId);
+        }
+      });
+
+      const plateHeroClick = document.getElementById('plate-hero-click');
+      plateHeroClick.addEventListener('click', () => {
+        if (activePlateSpeciesId) {
+          triggerElementXrayStatic(plateHeroClick, activePlateSpeciesId);
+        }
+      });
+    }
+
+    // ---------------------------------------------------------------------------
+    // 15. INITIALIZATION & WINDOW ONLOAD
+    // ---------------------------------------------------------------------------
+    function initScene() {
+      const container = document.getElementById('canvas-container');
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(PALETTE.BG);
+      scene.fog = new THREE.Fog(PALETTE.BG, 24, 48);
+
+      camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
+      raycaster = new THREE.Raycaster();
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.06;
+
+      container.appendChild(renderer.domElement);
+
+      const hemiLight = new THREE.HemisphereLight(0xFFFDFB, 0xF5D9C7, 0.92);
+      scene.add(hemiLight);
+
+      const dirLight = new THREE.DirectionalLight(0xFFF7EE, 0.88);
+      dirLight.position.set(10, 18, 12);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 2048;
+      dirLight.shadow.mapSize.height = 2048;
+      dirLight.shadow.camera.near = 2;
+      dirLight.shadow.camera.far = 42;
+      const d = 10.5;
+      dirLight.shadow.camera.left = -d;
+      dirLight.shadow.camera.right = d;
+      dirLight.shadow.camera.top = d;
+      dirLight.shadow.camera.bottom = -d;
+      dirLight.shadow.bias = -0.0005;
+      scene.add(dirLight);
+
+      const rimLight = new THREE.DirectionalLight(0xD5EEF5, 0.35);
+      rimLight.position.set(-12, 8, -10);
+      scene.add(rimLight);
+
+      initResources();
+      buildBaseplate();
+
+      gardenGroup = new THREE.Group();
+      fallenGroup = new THREE.Group();
+      scene.add(gardenGroup, fallenGroup);
+
+      if (window.innerWidth < 640) {
+        camState.radius = 23.5;
+        camState.targetRadius = 23.5;
+      }
+
+      setupInteractions(renderer.domElement);
+      setupUI();
+
+      window.addEventListener('resize', () => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      });
+
+      // Populate garden immediately in full bloom
+      buildInitialGarden();
+    }
+
+    window.onload = function () {
+      initScene();
+      animate();
+    };
+  </script>
+</body>
+</html>
