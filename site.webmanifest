@@ -1,0 +1,27 @@
+{
+  "name": "Mechanic Botanic — Kai Kleinbard",
+  "short_name": "Mechanic Botanic",
+  "description": "Interactive 3D digital garden and vintage herbarium wall of modular botanical blooms and harmonic chimes by Kai Kleinbard.",
+  "start_url": "/mechanic-botanic/",
+  "scope": "/mechanic-botanic/",
+  "display": "standalone",
+  "background_color": "#FDF0E7",
+  "theme_color": "#FDF0E7",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ]
+}
